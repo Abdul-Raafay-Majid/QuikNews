@@ -1,11 +1,9 @@
 package com.example.quiknews.domain.model
 
-import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity
-data class Article(
-    @PrimaryKey val  id:Int=0,
+
+data class ArticleDto(
     val section:String,
     val subsection:String,
     val title:String,

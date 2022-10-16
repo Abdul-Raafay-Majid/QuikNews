@@ -1,10 +1,14 @@
 package com.example.quiknews.data.local
 
- abstract class NewsDb {
+import androidx.room.Database
+import androidx.room.RoomDatabase
 
-     abstract val newsDao:NewsDao
+@Database(entities = [ArticleEntity::class], version = 1)
+abstract class NewsDb: RoomDatabase() {
 
-     companion object{
-         const val DB_NAME="news_db"
-     }
+    abstract val newsDao: NewsDao
+
+    companion object {
+        const val DB_NAME = "news_db"
+    }
 }

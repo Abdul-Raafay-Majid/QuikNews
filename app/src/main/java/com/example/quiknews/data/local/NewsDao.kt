@@ -1,24 +1,22 @@
 package com.example.quiknews.data.local
 
 import androidx.room.*
-import com.example.quiknews.domain.model.Article
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface NewsDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertArticles(articles:List<Article>)
+    suspend fun insertArticles(articles:List<ArticleEntity>)
 
-    @Query("DELETE FROM article WHERE id IN (:articlesId)")
+    @Query("DELETE FROM articleentity WHERE id IN (:articlesId)")
    suspend  fun deleteArticles(articlesId:List<Int>)
 
-   @Query("DELETE FROM Article")
+   @Query("DELETE FROM ArticleEntity")
    suspend fun deleteAllArticles()
 
-   @Query("SELECT * FROM article")
-   suspend fun getAllArticles(): Flow<List<Article>>?
+   @Query("SELECT * FROM articleentity")
+   suspend fun getAllArticles(): List<ArticleEntity>?
 
-   @Query("SELECT * FROM article WHERE id=:id LIMIT 1 ")
-   suspend fun getArticleById(id:Int):Flow<Article>?
+   @Query("SELECT * FROM articleentity WHERE id=:id LIMIT 1 ")
+   suspend fun getArticleById(id:Int):List<ArticleEntity>?
 }
