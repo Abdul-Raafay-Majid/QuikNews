@@ -16,7 +16,8 @@ import java.io.IOException
 import javax.inject.Inject
 
 class NewsRepoImpl @Inject constructor(
-    private val newsWireApi: NewsWireApi
+    private val newsWireApi: NewsWireApi,
+    private val newsDao: NewsDao
 ) : NewsRepo {
     override suspend fun insertArticles(articles: List<ArticleEntity>) {
 

@@ -44,7 +44,7 @@ object NewsWireModule {
     @Provides
     @Singleton
     fun providesNewRepo(api:NewsWireApi,db:NewsDb):NewsRepo{
-        return NewsRepoImpl(newsWireApi = api)
+        return NewsRepoImpl(newsWireApi = api,db.newsDao)
     }
 
     @Provides
