@@ -1,5 +1,6 @@
 package com.example.quiknews.data
 
+import android.util.Log
 import com.example.quiknews.core.utils.Resource
 import com.example.quiknews.data.local.ArticleEntity
 import com.example.quiknews.data.local.NewsDao
@@ -15,7 +16,6 @@ import java.io.IOException
 import javax.inject.Inject
 
 class NewsRepoImpl @Inject constructor(
-    private val newsDao: NewsDao,
     private val newsWireApi: NewsWireApi
 ) : NewsRepo {
     override suspend fun insertArticles(articles: List<ArticleEntity>) {
@@ -44,22 +44,21 @@ class NewsRepoImpl @Inject constructor(
     ): Flow<Resource<NewsWireDto>> {
         return withContext(Dispatchers.IO) {
             flow {
-                emit(Resource.Loading())
-                val newsArticle = newsDao.getAllArticles()?: emptyList<List<ArticleEntity>>()
-                lateinit var data:NewsWireDto
+                emit(Resource.Loading(message="Loading"))
                 try {
-                     val data = newsWireApi.getNewsWireApi(source, section)
+                     val data = newsWireApi.getNewsWireApi(source = source, section = section)
+                    Log.d("API","API CALLED")
+                     emit(Resource.Success(data))
                 } catch (e: HttpException) {
                     emit(
                         Resource.Error(
-                            "Oops something went wrong!"
+                            "Oops something went wrong! $e"
                         )
                     )
                 } catch (e: IOException) {
-                    emit(Resource.Error("Check your internet connection!"))
+                    emit(Resource.Error("Check your internet connection! $e"))
                 }
 
-                emit(Resource.Success(data))
 
 
             }

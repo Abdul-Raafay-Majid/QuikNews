@@ -15,6 +15,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.create
 import javax.inject.Singleton
 
 @Module
@@ -24,10 +25,10 @@ object NewsWireModule {
     @Provides
     @Singleton
     fun providesNewsWireApi():NewsWireApi{
-        return Retrofit.Builder().baseUrl("https://api.nytimes.com/")
+        return Retrofit.Builder().baseUrl(" https://api.nytimes.com/svc/news/v3/")
             .addConverterFactory(MoshiConverterFactory.create())
             .build()
-            .create(NewsWireApi::class.java)
+            .create()
     }
 
     @Provides
@@ -43,7 +44,7 @@ object NewsWireModule {
     @Provides
     @Singleton
     fun providesNewRepo(api:NewsWireApi,db:NewsDb):NewsRepo{
-        return NewsRepoImpl(db.newsDao,api)
+        return NewsRepoImpl(newsWireApi = api)
     }
 
     @Provides

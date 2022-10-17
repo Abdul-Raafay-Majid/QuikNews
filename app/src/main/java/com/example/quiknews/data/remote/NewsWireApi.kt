@@ -2,6 +2,7 @@ package com.example.quiknews.data.remote
 
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface NewsWireApi {
 
@@ -9,10 +10,11 @@ interface NewsWireApi {
         const val API_KEY="Qu5TE4pLAjscRqUAoHpNiGmM1qZkyHzq"
     }
 
-    @GET("svc/news/v3/content/section-list.json?api-key=$API_KEY")
-    fun getNewsWireApi(
-     @Path("source") source:String,
-     @Path("section") section:String
+    @GET("content/{source}/{section}.json")
+    suspend fun getNewsWireApi(
+        @Path("source") source:String,
+        @Path("section") section:String,
+        @Query("api-key") apiKey:String= API_KEY,
     ): NewsWireDto
 
 }

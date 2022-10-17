@@ -4,15 +4,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.quiknews.core.utils.Resource
+import com.example.quiknews.data.NewsRepoImpl
 import com.example.quiknews.domain.NewsWireUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class NewsWireViewModel @Inject constructor(
-    private val newsWireUseCase: NewsWireUseCase
+    private val newsWireUseCase: NewsWireUseCase,
+    private val newsRepo:NewsRepoImpl
 ) :
     ViewModel() {
 
@@ -22,7 +25,7 @@ class NewsWireViewModel @Inject constructor(
         getNewsWireUseCases(NewsWireEvent.GetArticles("all", "all"))
     }
 
-    private fun getNewsWireUseCases(newsWireEvent: NewsWireEvent) {
+     fun getNewsWireUseCases(newsWireEvent: NewsWireEvent) {
         when (newsWireEvent) {
             is NewsWireEvent.GetArticles -> {
                 viewModelScope.launch {
@@ -44,11 +47,11 @@ class NewsWireViewModel @Inject constructor(
 
                                 is Resource.Error -> {
                                     newsWireState.value = newsWireState.value.copy(
-                                        error = "Some Error Occurred"
+                                        error = result.message
                                     )
                                 }
                             }
-                        }
+                        }.launchIn(this)
                 }
             }
         }
