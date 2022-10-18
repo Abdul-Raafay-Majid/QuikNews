@@ -1,7 +1,8 @@
 package com.example.quiknews.presentation.utils
 
-sealed class Sections( val display_name:String){
+import androidx.annotation.DrawableRes
 
+sealed class Sections(){
 
     companion object{
         val sections= listOf<Section>(
