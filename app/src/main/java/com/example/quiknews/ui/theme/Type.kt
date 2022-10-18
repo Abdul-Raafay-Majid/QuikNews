@@ -1,6 +1,7 @@
 package com.example.quiknews.ui.theme
 
 import androidx.compose.material.Typography
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -20,22 +21,27 @@ val Typography = Typography(
     roboto,
     h5= TextStyle(
         fontWeight = FontWeight.SemiBold,
-        fontSize = 24.sp
+        fontSize = 24.sp,
+        color = Color.Black
     ),
     subtitle2 = TextStyle(
         fontWeight = FontWeight.Normal,
-        fontSize = 14.sp
+        fontSize = 14.sp,
+        color = Color.Black
     ),
     overline = TextStyle(
         fontWeight = FontWeight.Light,
-        fontSize = 10.sp
+        fontSize = 10.sp,
+        color = Color.Black
     ),
     caption = TextStyle(
         fontWeight = FontWeight.ExtraLight,
-        fontSize = 11.sp
+        fontSize = 11.sp,
+        color = Color.Black
     ),
     body1 = TextStyle(
         fontWeight = FontWeight.Medium,
-        fontSize = 14.sp
+        fontSize = 14.sp,
+        color = Color.White
     )
 )

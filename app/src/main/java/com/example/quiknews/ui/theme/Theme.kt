@@ -13,16 +13,12 @@ import androidx.compose.ui.graphics.Color
 private val DarkColorPalette = darkColors(
     //Button Color
     primary = Orange,
-    //Background Color
-    secondary = OffWhite,
     //Button Text
     onPrimary = White,
     //Card Color
-    background = Color.White,
-    //Card Text
-    onBackground = Color.Black,
-    surface = White,
-    onSurface = Color.Black
+    surface = Color.White,
+
+
 )
 
 private val LightColorPalette = lightColors(
