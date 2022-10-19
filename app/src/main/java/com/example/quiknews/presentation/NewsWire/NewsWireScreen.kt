@@ -22,10 +22,12 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.quiknews.R
 import com.example.quiknews.domain.model.ArticleDto
+import com.example.quiknews.presentation.NewsWireEvent
 import com.example.quiknews.presentation.NewsWireState
 import com.example.quiknews.presentation.NewsWireViewModel
 import com.example.quiknews.presentation.utils.Section
 import com.example.quiknews.presentation.utils.Sections
+import com.example.quiknews.ui.theme.OffWhite
 import com.google.accompanist.pager.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -45,7 +47,7 @@ fun NewsWireScreen(
         Column(
             modifier=Modifier.fillMaxSize()
         ) {
-            SectionTabs(sections = Sections.sections , pagerState =pagerState )
+            SectionTabs(sections = Sections.sections , pagerState =pagerState ,newsWireViewModel)
             SectionContentScreen(sections =Sections.sections , pagerState =pagerState , newsWireState =uiState)
         }
     }
@@ -55,7 +57,8 @@ fun NewsWireScreen(
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun SectionTabs(
-    sections:List<Section>, pagerState: PagerState
+    sections:List<Section>, pagerState: PagerState,
+    viewModel: NewsWireViewModel
 ){
     val scope= rememberCoroutineScope()
     ScrollableTabRow(
@@ -76,11 +79,12 @@ fun SectionTabs(
                 text = {
                     Text(
                         text=section.display_name,
-                        style = MaterialTheme.typography.overline
+                        style = MaterialTheme.typography.subtitle1
                     )
                        },
                 onClick = {
                           scope.launch {
+                              viewModel.getNewsWireUseCases(NewsWireEvent.GetArticles("all",section.pathParam))
                               pagerState.animateScrollToPage(index)
                           }
                 },
@@ -103,7 +107,7 @@ fun SectionContentScreen(
     HorizontalPager(
         state=pagerState,
         count = sections.size
-    ) { page->
+    ) {
         SectionContent(modifier =Modifier.fillMaxWidth() , newsWireState =newsWireState )
     }
 }
@@ -114,10 +118,17 @@ fun SectionContent(
     modifier: Modifier,
     newsWireState: NewsWireState
 ){
-    newsWireState.newsWireDto?.results?.let { articles->
-        LazyColumn(){
-            itemsIndexed(articles){ index,article->
-                ArticleItem(article =article)
+    newsWireState.newsWireDto?.results?.let { articles ->
+        Box {
+            LazyColumn() {
+                itemsIndexed(articles) { index, article ->
+                    ArticleItem(article = article)
+                }
+            }
+            if(newsWireState.isLoading){
+                CircularProgressIndicator(
+                    modifier=Modifier.align(Alignment.Center)
+                )
             }
         }
     }
