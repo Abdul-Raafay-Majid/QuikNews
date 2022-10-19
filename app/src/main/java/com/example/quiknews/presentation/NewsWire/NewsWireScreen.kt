@@ -2,8 +2,12 @@ package com.example.quiknews.presentation.NewsWire
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -13,19 +17,110 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.quiknews.R
 import com.example.quiknews.domain.model.ArticleDto
+import com.example.quiknews.presentation.NewsWireState
+import com.example.quiknews.presentation.NewsWireViewModel
+import com.example.quiknews.presentation.utils.Section
+import com.example.quiknews.presentation.utils.Sections
+import com.google.accompanist.pager.*
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
-fun NewsWireScreen() {
+fun NewsWireScreen(
+    modifier: Modifier=Modifier,
+    newsWireViewModel: NewsWireViewModel= hiltViewModel()
+) {
+  val pagerState= rememberPagerState()
+  val uiState by newsWireViewModel._newsWireState
+
+    Box(
+        modifier = modifier
+    ){
+        Column(
+            modifier=Modifier.fillMaxSize()
+        ) {
+            SectionTabs(sections = Sections.sections , pagerState =pagerState )
+            SectionContentScreen(sections =Sections.sections , pagerState =pagerState , newsWireState =uiState)
+        }
+    }
+}
+
+
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+fun SectionTabs(
+    sections:List<Section>, pagerState: PagerState
+){
+    val scope= rememberCoroutineScope()
+    ScrollableTabRow(
+        selectedTabIndex = pagerState.currentPage,
+        indicator = { tabPositions->
+            TabRowDefaults.Indicator(
+                modifier = Modifier.pagerTabIndicatorOffset(
+                    pagerState,tabPositions
+                ),
+                color = MaterialTheme.colors.primary
+            )
+        }
+    ) {
+        sections.forEachIndexed { index, section ->
+            LeadingIconTab(
+                icon = {},
+                selected =pagerState.currentPage==index ,
+                text = {
+                    Text(
+                        text=section.display_name,
+                        style = MaterialTheme.typography.overline
+                    )
+                       },
+                onClick = {
+                          scope.launch {
+                              pagerState.animateScrollToPage(index)
+                          }
+                },
+            )
+        }
+
+    }
 
 }
 
 
+
+@OptIn(ExperimentalPagerApi::class)
 @Composable
-fun ContentScreen() {
+fun SectionContentScreen(
+    sections:List<Section>,
+    pagerState: PagerState,
+    newsWireState: NewsWireState
+) {
+    HorizontalPager(
+        state=pagerState,
+        count = sections.size
+    ) { page->
+        SectionContent(modifier =Modifier.fillMaxWidth() , newsWireState =newsWireState )
+    }
+}
+
+
+@Composable
+fun SectionContent(
+    modifier: Modifier,
+    newsWireState: NewsWireState
+){
+    newsWireState.newsWireDto?.results?.let { articles->
+        LazyColumn(){
+            itemsIndexed(articles){ index,article->
+                ArticleItem(article =article)
+            }
+        }
+    }
 
 }
 

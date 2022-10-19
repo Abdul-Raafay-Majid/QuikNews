@@ -19,7 +19,10 @@ class NewsWireViewModel @Inject constructor(
 ) :
     ViewModel() {
 
-    val newsWireState = mutableStateOf(NewsWireState())
+    private val newsWireState = mutableStateOf(NewsWireState())
+    val _newsWireState=newsWireState
+
+
 
     init {
         getNewsWireUseCases(NewsWireEvent.GetArticles("all", "all"))
