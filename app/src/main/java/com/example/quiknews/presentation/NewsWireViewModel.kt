@@ -19,8 +19,8 @@ class NewsWireViewModel @Inject constructor(
 ) :
     ViewModel() {
 
-    private val newsWireState = mutableStateOf(NewsWireState())
-    val _newsWireState=newsWireState
+    private val _newsWireState = mutableStateOf(NewsWireState())
+    val newsWireState= this._newsWireState
 
 
 
@@ -32,24 +32,29 @@ class NewsWireViewModel @Inject constructor(
         when (newsWireEvent) {
             is NewsWireEvent.GetArticles -> {
                 viewModelScope.launch {
+                    if(_newsWireState.value.newsWireDto!=null)
+                    _newsWireState.value=newsWireState.value.copy(
+                        newsWireDto = null,
+                        isLoading = true,
+                    )
                     newsWireUseCase.getNewsWireData(newsWireEvent.source, newsWireEvent.section)
                         .onEach { result ->
                             when (result) {
                                 is Resource.Success -> {
-                                    newsWireState.value = newsWireState.value.copy(
+                                    this@NewsWireViewModel.newsWireState.value = this@NewsWireViewModel.newsWireState.value.copy(
                                         newsWireDto = result.data,
                                         isLoading = false
                                     )
                                 }
 
                                 is Resource.Loading -> {
-                                    newsWireState.value = newsWireState.value.copy(
+                                    this@NewsWireViewModel.newsWireState.value = this@NewsWireViewModel.newsWireState.value.copy(
                                         isLoading = true
                                     )
                                 }
 
                                 is Resource.Error -> {
-                                    newsWireState.value = newsWireState.value.copy(
+                                    this@NewsWireViewModel.newsWireState.value = this@NewsWireViewModel.newsWireState.value.copy(
                                         error = result.message
                                     )
                                 }

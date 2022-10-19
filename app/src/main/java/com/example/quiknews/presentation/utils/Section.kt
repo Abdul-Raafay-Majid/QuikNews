@@ -1,14 +1,21 @@
 package com.example.quiknews.presentation.utils
 
+import android.media.tv.TvContract.Programs.Genres.*
 import androidx.annotation.DrawableRes
+import androidx.compose.runtime.Composable
 
-sealed class Sections(){
+typealias SectionScreen=@Composable ()->Unit
+
+sealed class Sections(
+    val display_name:String,
+    val pathParam:String,
+    val screen:SectionScreen
+){
 
     companion object{
         val sections= listOf<Section>(
-            Section.HOME_PAGE,
+            Section.ALL,
             Section.BRIEFING,
-            Section.TODAYS_PAPER,
             Section.BUSINESS,
             Section.TECHNOLOGY,
             Section.SCIENCE,
@@ -16,30 +23,21 @@ sealed class Sections(){
             Section.AUTOMOBILES,
             Section.TRAVEL,
             Section.WORLD,
-            Section.ADMIN,
-            Section.ARTS,
             Section.EDUCATION,
             Section.FASHION,
             Section.FOOD,
             Section.HEAlTH,
             Section.MOVIES,
-            Section.BOOKS,
             Section.CLIMATE,
-            Section.STYLE,
             Section.VIDEO,
-            Section.CROSSWORDS_AND_GAMES,
-            Section.HOME_AND_GARDEN,
-            Section.JOB_MARKET,
-            Section.MAGAZINE,
             Section.OBITUARIES,
-            Section.NEW_YORK,
-            Section.PARENTING,
             Section.PODCASTS,
             Section.REAL_ESTATE,
         )
     }
 }
 enum class Section(val display_name:String, val pathParam:String) {
+    ALL("All","all"),
     ADMIN("Admin","admin"),
     ARTS("Arts","arts"),
     AUTOMOBILES("Automobiles","automobiles"),
