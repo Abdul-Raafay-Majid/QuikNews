@@ -15,7 +15,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.quiknews.domain.model.ArticleDto
 import com.example.quiknews.presentation.NewsWire.ArticleItem
 import com.example.quiknews.presentation.NewsWireViewModel
-import com.example.quiknews.presentation.TestScreen
 import com.example.quiknews.ui.theme.QuikNewsTheme
 import dagger.hilt.android.AndroidEntryPoint
 
