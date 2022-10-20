@@ -5,7 +5,6 @@ import com.example.quiknews.core.utils.Resource
 import com.example.quiknews.data.local.ArticleEntity
 import com.example.quiknews.data.local.NewsDao
 import com.example.quiknews.data.remote.NewsWireApi
-import com.example.quiknews.data.remote.NewsWireDto
 import com.example.quiknews.domain.repository.NewsRepo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -28,7 +27,7 @@ class NewsRepoImpl @Inject constructor(
     }
 
     override suspend fun deleteAllArticles() {
-        TODO("Not yet implemented")
+        newsDao.deleteAllArticles()
     }
 
     override suspend fun getAllArticles(): Flow<List<ArticleEntity>> {
@@ -42,27 +41,35 @@ class NewsRepoImpl @Inject constructor(
     override suspend fun getNewsWireApiData(
         source: String,
         section: String
-    ): Flow<Resource<NewsWireDto>> {
+    ): Flow<Resource<List<ArticleEntity>>> {
         return withContext(Dispatchers.IO) {
             flow {
-                emit(Resource.Loading(message="Loading"))
-                try {
-                     val data = newsWireApi.getNewsWireApi(source = source, section = section)
-                    Log.d("API","API CALLED")
-                     emit(Resource.Success(data))
-                } catch (e: HttpException) {
-                    emit(
-                        Resource.Error(
-                            "Oops something went wrong! $e"
+                emit(Resource.Loading(message = "Loading"))
+                var dbData: List<ArticleEntity>? = newsDao.getArticleBySection(section)
+                if(dbData.isNullOrEmpty()) {
+                    try {
+                        val remoteData =
+                            newsWireApi.getNewsWireApi(source = source, section = section)
+                                .getArticleList(section)
+                        Log.d("API", "API CALLED")
+                        newsDao.insertArticles(remoteData)
+                    } catch (e: HttpException) {
+                        emit(
+                            Resource.Error(
+                                "Oops something went wrong! $e"
+                            )
                         )
-                    )
-                } catch (e: IOException) {
-                    emit(Resource.Error("Check your internet connection! $e"))
+                    } catch (e: IOException) {
+                        emit(Resource.Error("Check your internet connection! $e"))
+                    }
                 }
 
 
-
+                dbData = newsDao.getArticleBySection(section)
+                emit(Resource.Success(dbData))
             }
         }
+
+
     }
 }

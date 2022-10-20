@@ -1,5 +1,7 @@
 package com.example.quiknews.presentation.NewsWire
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,11 +21,13 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.example.quiknews.data.local.ArticleEntity
 import com.example.quiknews.domain.model.ArticleDto
 import com.example.quiknews.presentation.NewsWireEvent
 import com.example.quiknews.presentation.NewsWireState
 import com.example.quiknews.presentation.NewsWireViewModel
 import com.example.quiknews.presentation.utils.Section
+import com.example.quiknews.presentation.utils.getArticleDate
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
@@ -75,6 +79,7 @@ fun SectionTabs(
 
 }
 
+
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun SectionContentScreen(
@@ -93,9 +98,10 @@ fun SectionContentScreen(
 }
 
 
+
 @Composable
 fun ArticleItem(
-    article: ArticleDto,
+    article: ArticleEntity,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -149,9 +155,9 @@ fun ArticleItem(
 
             }
             Spacer(modifier = Modifier.height(8.dp))
-            if(article.abstract.isNotBlank()) {
+            if(article.abstraction.isNotBlank()) {
                 Text(
-                    text = article.abstract,
+                    text = article.abstraction,
                     style = MaterialTheme.typography.subtitle2
                 )
             }
@@ -161,7 +167,7 @@ fun ArticleItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Yesterday",
+                    text = getArticleDate(article.updated_date),
                     style = MaterialTheme.typography.caption
                 )
                 IconButton(
@@ -193,39 +199,6 @@ fun ArticleItem(
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @Composable
 fun SectionContent(
     modifier: Modifier,
@@ -234,7 +207,7 @@ fun SectionContent(
     Box(
         modifier=modifier
     ) {
-        newsWireState.newsWireDto?.results?.let { articles ->
+        newsWireState.newsWireArticles?.let { articles ->
             LazyColumn() {
                 itemsIndexed(articles) { index, article ->
                     ArticleItem(article = article)

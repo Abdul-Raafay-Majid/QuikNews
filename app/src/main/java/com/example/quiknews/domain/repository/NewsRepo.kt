@@ -3,6 +3,7 @@ package com.example.quiknews.domain.repository
 import com.example.quiknews.core.utils.Resource
 import com.example.quiknews.data.local.ArticleEntity
 import com.example.quiknews.data.remote.NewsWireDto
+import com.example.quiknews.domain.model.ArticleDto
 import kotlinx.coroutines.flow.Flow
 
 interface NewsRepo {
@@ -17,5 +18,5 @@ interface NewsRepo {
 
     suspend fun getArticleById(id:Int): List<ArticleEntity>
 
-    suspend fun getNewsWireApiData(source:String,section:String):Flow<Resource<NewsWireDto>>
+    suspend fun getNewsWireApiData(source:String,section:String):Flow<Resource<List<ArticleEntity>>>
 }

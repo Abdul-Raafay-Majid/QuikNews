@@ -32,9 +32,9 @@ class NewsWireViewModel @Inject constructor(
         when (newsWireEvent) {
             is NewsWireEvent.GetArticles -> {
                 viewModelScope.launch {
-                    if(_newsWireState.value.newsWireDto!=null)
+                    if(_newsWireState.value.newsWireArticles!=null)
                     _newsWireState.value=newsWireState.value.copy(
-                        newsWireDto = null,
+                        newsWireArticles = null,
                         isLoading = true,
                     )
                     newsWireUseCase.getNewsWireData(newsWireEvent.source, newsWireEvent.section)
@@ -42,14 +42,15 @@ class NewsWireViewModel @Inject constructor(
                             when (result) {
                                 is Resource.Success -> {
                                     this@NewsWireViewModel.newsWireState.value = this@NewsWireViewModel.newsWireState.value.copy(
-                                        newsWireDto = result.data,
+                                        newsWireArticles = result.data,
                                         isLoading = false
                                     )
                                 }
 
                                 is Resource.Loading -> {
                                     this@NewsWireViewModel.newsWireState.value = this@NewsWireViewModel.newsWireState.value.copy(
-                                        isLoading = true
+                                        newsWireArticles = result.data,
+                                        isLoading = true,
                                     )
                                 }
 
@@ -60,6 +61,12 @@ class NewsWireViewModel @Inject constructor(
                                 }
                             }
                         }.launchIn(this)
+                }
+            }
+
+            is NewsWireEvent.ClearAllArticles->{
+                viewModelScope.launch {
+                    newsWireUseCase.deleteAllArticles()
                 }
             }
         }

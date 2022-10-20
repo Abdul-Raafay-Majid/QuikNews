@@ -17,6 +17,6 @@ interface NewsDao {
    @Query("SELECT * FROM articleentity")
    suspend fun getAllArticles(): List<ArticleEntity>?
 
-   @Query("SELECT * FROM articleentity WHERE id=:id LIMIT 1 ")
-   suspend fun getArticleById(id:Int):List<ArticleEntity>?
+   @Query("SELECT * FROM articleentity WHERE section=:section")
+   suspend fun getArticleBySection(section:String):List<ArticleEntity>?
 }

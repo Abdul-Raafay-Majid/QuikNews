@@ -8,6 +8,7 @@ import com.example.quiknews.data.local.NewsDb
 import com.example.quiknews.data.remote.NewsWireApi
 import com.example.quiknews.domain.NewsWireUseCase
 import com.example.quiknews.domain.repository.NewsRepo
+import com.example.quiknews.domain.use_case.DeleteAllArticles
 import com.example.quiknews.domain.use_case.GetNewsWireData
 import dagger.Module
 import dagger.Provides
@@ -57,7 +58,8 @@ object NewsWireModule {
     @Singleton
     fun providesNewsWireUseCase(repo: NewsRepo):NewsWireUseCase{
         return NewsWireUseCase(
-            getNewsWireData = GetNewsWireData(newsRepo = repo)
+            getNewsWireData = GetNewsWireData(newsRepo = repo),
+            deleteAllArticles = DeleteAllArticles(newsRepo = repo)
         )
     }
 }
