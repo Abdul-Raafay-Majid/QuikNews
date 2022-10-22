@@ -10,10 +10,13 @@ import com.example.quiknews.domain.NewsWireUseCase
 import com.example.quiknews.domain.repository.NewsRepo
 import com.example.quiknews.domain.use_case.DeleteAllArticles
 import com.example.quiknews.domain.use_case.GetNewsWireData
+import com.example.quiknews.domain.use_case.RefreshArticle
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.create
@@ -59,7 +62,14 @@ object NewsWireModule {
     fun providesNewsWireUseCase(repo: NewsRepo):NewsWireUseCase{
         return NewsWireUseCase(
             getNewsWireData = GetNewsWireData(newsRepo = repo),
-            deleteAllArticles = DeleteAllArticles(newsRepo = repo)
+            deleteAllArticles = DeleteAllArticles(newsRepo = repo),
+            refreshArticle = RefreshArticle(newsRepo = repo)
         )
+    }
+
+    @Provides
+    @Singleton
+    fun provideIODispatcher():CoroutineDispatcher{
+        return Dispatchers.IO
     }
 }

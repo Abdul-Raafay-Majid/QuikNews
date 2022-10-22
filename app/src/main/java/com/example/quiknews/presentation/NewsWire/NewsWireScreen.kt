@@ -1,62 +1,79 @@
 package com.example.quiknews.presentation.NewsWire
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
-import com.example.quiknews.R
-import com.example.quiknews.domain.model.ArticleDto
 import com.example.quiknews.presentation.NewsWireEvent
-import com.example.quiknews.presentation.NewsWireState
 import com.example.quiknews.presentation.NewsWireViewModel
-import com.example.quiknews.presentation.utils.Section
 import com.example.quiknews.presentation.utils.Sections
-import com.google.accompanist.pager.*
-import kotlinx.coroutines.launch
+import com.example.quiknews.ui.theme.Orange
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.rememberPagerState
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun NewsWireScreen(
-    modifier: Modifier=Modifier,
-    newsWireViewModel: NewsWireViewModel= hiltViewModel()
+    modifier: Modifier = Modifier,
+    newsWireViewModel: NewsWireViewModel = hiltViewModel()
 ) {
-  val pagerState= rememberPagerState()
-  val uiState by newsWireViewModel.newsWireState
-
+    val pagerState = rememberPagerState()
+    val uiState by newsWireViewModel.newsWireState
+    val isRefreshing = rememberSwipeRefreshState(isRefreshing = false)
     Box(
         modifier = modifier
-    ){
-        Column(
-            modifier=Modifier.fillMaxSize()
+    ) {
+        SwipeRefresh(
+            modifier = Modifier,
+            state = isRefreshing,
+            onRefresh = {
+                newsWireViewModel.getNewsWireUseCases(
+                    NewsWireEvent.RefreshArticles(
+                        section = "all",
+                        source = uiState.section ?: "all"
+                    )
+                )
+            },
+            refreshTriggerDistance = 100.dp,
+            indicator = { state, trigger ->
+                SwipeRefreshIndicator(
+                    state = state,
+                    refreshTriggerDistance = trigger,
+                    scale = true,
+                    contentColor = Orange
+                )
+            }
         ) {
-            SectionTabs(
-                modifier = Modifier.weight(1f),
-                sections = Sections.sections ,
-                pagerState =pagerState ,
-                newsWireViewModel,
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+            ) {
+                SectionTabs(
+                    modifier = Modifier.weight(1f),
+                    sections = Sections.sections,
+                    pagerState = pagerState,
+                    newsWireViewModel = newsWireViewModel,
 
-            )
-            SectionContentScreen(
-                modifier=Modifier.weight(17f),
-                sections =Sections.sections ,
-                pagerState =pagerState ,
-                newsWireState =uiState,
-            )
+                    )
+                SectionContentScreen(
+                    modifier = Modifier.weight(17f),
+                    sections = Sections.sections,
+                    pagerState = pagerState,
+                    newsWireState = uiState,
+                    newsWireViewModel = newsWireViewModel
+
+                )
+            }
         }
     }
 }

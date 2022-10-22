@@ -1,20 +1,22 @@
 package com.example.quiknews.presentation.NewsWire
 
-import android.os.Build
-import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
-import androidx.compose.material.R
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.rotary.onRotaryScrollEvent
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -22,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.quiknews.data.local.ArticleEntity
-import com.example.quiknews.domain.model.ArticleDto
 import com.example.quiknews.presentation.NewsWireEvent
 import com.example.quiknews.presentation.NewsWireState
 import com.example.quiknews.presentation.NewsWireViewModel
@@ -32,25 +33,28 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.pagerTabIndicatorOffset
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun SectionTabs(
-    modifier:Modifier=Modifier,
-    sections:List<Section>,
+    modifier: Modifier = Modifier,
+    sections: List<Section>,
     pagerState: PagerState,
-    viewModel: NewsWireViewModel
-){
-    val scope= rememberCoroutineScope()
+    newsWireViewModel: NewsWireViewModel
+) {
+
+    val scope = rememberCoroutineScope()
     ScrollableTabRow(
-        modifier=modifier,
+        modifier = modifier,
         selectedTabIndex = pagerState.currentPage,
-        indicator = { tabPositions->
+        indicator = { tabPositions ->
             TabRowDefaults.Indicator(
                 modifier = Modifier.pagerTabIndicatorOffset(
-                    pagerState,tabPositions
+                    pagerState, tabPositions
                 ),
                 color = MaterialTheme.colors.primary
             )
@@ -59,16 +63,15 @@ fun SectionTabs(
         sections.forEachIndexed { index, section ->
             LeadingIconTab(
                 icon = {},
-                selected =pagerState.currentPage==index ,
+                selected = pagerState.currentPage == index,
                 text = {
                     Text(
-                        text=section.display_name,
+                        text = section.display_name,
                         style = MaterialTheme.typography.subtitle1
                     )
                 },
                 onClick = {
                     scope.launch {
-                        viewModel.getNewsWireUseCases(NewsWireEvent.GetArticles("all",section.pathParam))
                         pagerState.animateScrollToPage(index)
                     }
                 },
@@ -83,27 +86,39 @@ fun SectionTabs(
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun SectionContentScreen(
-    modifier: Modifier=Modifier,
-    sections:List<Section>,
+    modifier: Modifier = Modifier,
+    sections: List<Section>,
     pagerState: PagerState,
-    newsWireState: NewsWireState
+    newsWireState: NewsWireState,
+    newsWireViewModel: NewsWireViewModel
 ) {
+
+    LaunchedEffect(pagerState){
+        snapshotFlow { pagerState.currentPage }.collect{ page->
+            newsWireViewModel.getNewsWireUseCases(NewsWireEvent.GetArticles(page))
+        }
+    }
     HorizontalPager(
         modifier = modifier,
-        state=pagerState,
+        state = pagerState,
         count = sections.size
     ) {
-        SectionContent(modifier =Modifier.fillMaxWidth() , newsWireState =newsWireState )
+        SectionContent(
+            modifier = Modifier.fillMaxWidth(),
+            newsWireState = newsWireState,
+            newsWireViewModel = newsWireViewModel
+        )
     }
 }
-
 
 
 @Composable
 fun ArticleItem(
     article: ArticleEntity,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    newsWireViewModel: NewsWireViewModel
 ) {
+    val context = LocalContext.current
     Card(
         modifier = modifier
             .padding(horizontal = 16.dp, vertical = 16.dp),
@@ -137,7 +152,7 @@ fun ArticleItem(
                         modifier = Modifier.padding(end = 4.dp),
                     )
                 }
-                if(article.thumbnail_standard!=null) {
+                if (article.thumbnail_standard != null) {
                     Box(
                         modifier = Modifier.weight(1f)
                     ) {
@@ -155,7 +170,7 @@ fun ArticleItem(
 
             }
             Spacer(modifier = Modifier.height(8.dp))
-            if(article.abstraction.isNotBlank()) {
+            if (article.abstraction.isNotBlank()) {
                 Text(
                     text = article.abstraction,
                     style = MaterialTheme.typography.subtitle2
@@ -171,7 +186,9 @@ fun ArticleItem(
                     style = MaterialTheme.typography.caption
                 )
                 IconButton(
-                    onClick = { /*TODO*/ },
+                    onClick = {
+                        newsWireViewModel.shareNewsArticle(context, article.url)
+                    },
                 ) {
                     Icon(
                         imageVector = ImageVector
@@ -183,7 +200,9 @@ fun ArticleItem(
             }
             Button(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = {}
+                onClick = {
+                    newsWireViewModel.launchArticleInBrowser(context, article.url)
+                }
             ) {
                 Text(
                     text = stringResource(id = com.example.quiknews.R.string.article_item_button_text),
@@ -202,25 +221,43 @@ fun ArticleItem(
 @Composable
 fun SectionContent(
     modifier: Modifier,
-    newsWireState: NewsWireState
-){
+    newsWireState: NewsWireState,
+    newsWireViewModel: NewsWireViewModel,
+) {
+
     Box(
-        modifier=modifier
+        modifier = modifier
     ) {
         newsWireState.newsWireArticles?.let { articles ->
+
             LazyColumn() {
                 itemsIndexed(articles) { index, article ->
-                    ArticleItem(article = article)
+                    ArticleItem(
+                        article = article,
+                        modifier = Modifier,
+                        newsWireViewModel
+                    )
                 }
             }
 
+
         }
-        if(newsWireState.isLoading){
+        if (newsWireState.isLoading) {
             CircularProgressIndicator(
-                modifier= Modifier.align(Alignment.Center)
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
+
+        newsWireState.error?.let {
+            Text(
+                modifier = Modifier.align(Alignment.Center).padding(top = 55.dp),
+                text = it,
+                style = MaterialTheme.typography.h6
             )
         }
     }
 
 }
+
+
 

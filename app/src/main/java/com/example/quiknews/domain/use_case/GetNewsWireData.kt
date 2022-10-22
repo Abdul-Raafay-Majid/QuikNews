@@ -4,6 +4,7 @@ import com.example.quiknews.core.utils.Resource
 import com.example.quiknews.data.local.ArticleEntity
 import com.example.quiknews.data.remote.NewsWireDto
 import com.example.quiknews.domain.NewsWireUseCase
+import com.example.quiknews.domain.model.NewsWireInfo
 import com.example.quiknews.domain.repository.NewsRepo
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -11,7 +12,7 @@ import javax.inject.Inject
 class GetNewsWireData (
     private val newsRepo: NewsRepo
 ) {
-    suspend operator fun invoke(source:String,section:String): Flow<Resource<List<ArticleEntity>>> {
+    suspend operator fun invoke(source:String,section:String): Flow<Resource<NewsWireInfo>> {
         return newsRepo.getNewsWireApiData(source,section)
     }
 }

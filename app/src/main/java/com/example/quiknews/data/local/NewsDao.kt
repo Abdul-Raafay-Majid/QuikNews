@@ -18,5 +18,5 @@ interface NewsDao {
    suspend fun getAllArticles(): List<ArticleEntity>?
 
    @Query("SELECT * FROM articleentity WHERE section=:section")
-   suspend fun getArticleBySection(section:String):List<ArticleEntity>?
+   suspend fun getArticleBySection(section:String):List<ArticleEntity>
 }

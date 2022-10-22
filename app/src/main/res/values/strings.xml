@@ -2,4 +2,6 @@
     <string name="app_name">QuikNews</string>
     <string name="ny_times_text">NY Times</string>
     <string name="article_item_button_text">Read the full article on NY Times</string>
+    <string name="share_txt">Share News</string>
+    <string name="all_txt">all</string>
 </resources>
