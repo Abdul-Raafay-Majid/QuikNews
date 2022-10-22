@@ -44,7 +44,6 @@ fun SectionTabs(
     modifier: Modifier = Modifier,
     sections: List<Section>,
     pagerState: PagerState,
-    newsWireViewModel: NewsWireViewModel
 ) {
 
     val scope = rememberCoroutineScope()
@@ -95,7 +94,9 @@ fun SectionContentScreen(
 
     LaunchedEffect(pagerState){
         snapshotFlow { pagerState.currentPage }.collect{ page->
-            newsWireViewModel.getNewsWireUseCases(NewsWireEvent.GetArticles(page))
+            newsWireViewModel.apply {
+                getNewsWireUseCases(NewsWireEvent.GetArticles(page))
+            }
         }
     }
     HorizontalPager(

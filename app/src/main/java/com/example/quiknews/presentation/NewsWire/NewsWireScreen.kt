@@ -37,10 +37,7 @@ fun NewsWireScreen(
             state = isRefreshing,
             onRefresh = {
                 newsWireViewModel.getNewsWireUseCases(
-                    NewsWireEvent.RefreshArticles(
-                        section = "all",
-                        source = uiState.section ?: "all"
-                    )
+                    NewsWireEvent.RefreshArticles(pagerState.currentPage)
                 )
             },
             refreshTriggerDistance = 100.dp,
@@ -62,7 +59,6 @@ fun NewsWireScreen(
                     modifier = Modifier.weight(1f),
                     sections = Sections.sections,
                     pagerState = pagerState,
-                    newsWireViewModel = newsWireViewModel,
 
                     )
                 SectionContentScreen(

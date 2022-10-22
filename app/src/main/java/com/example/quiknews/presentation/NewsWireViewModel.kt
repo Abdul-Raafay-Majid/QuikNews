@@ -21,7 +21,6 @@ import javax.inject.Inject
 @HiltViewModel
 class NewsWireViewModel @Inject constructor(
     private val newsWireUseCase: NewsWireUseCase,
-    private val newsRepo: NewsRepoImpl
 ) :
     ViewModel() {
 
@@ -33,7 +32,6 @@ class NewsWireViewModel @Inject constructor(
 
     init {
         getNewsWireUseCases(NewsWireEvent.ClearAllArticles)
-        getNewsWireUseCases(NewsWireEvent.GetArticles(0))
     }
 
     fun getNewsWireUseCases(newsWireEvent: NewsWireEvent) {
@@ -99,7 +97,7 @@ class NewsWireViewModel @Inject constructor(
                             section = "",
                             error = null
                         )
-                    newsWireUseCase.refreshArticle("all", newsWireEvent.section).onEach { result ->
+                    newsWireUseCase.refreshArticle("all", Sections.sections[newsWireEvent.page].pathParam).onEach { result ->
                         when (result) {
                             is Resource.Loading -> {
                                 this@NewsWireViewModel.newsWireState.value =
@@ -112,7 +110,8 @@ class NewsWireViewModel @Inject constructor(
                             is Resource.Error -> {
                                 this@NewsWireViewModel.newsWireState.value =
                                     this@NewsWireViewModel.newsWireState.value.copy(
-                                        error = result.message
+                                        error = result.message,
+                                        section = ""
                                     )
                             }
 

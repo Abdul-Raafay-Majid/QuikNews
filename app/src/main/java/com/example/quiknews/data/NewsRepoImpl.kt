@@ -71,6 +71,7 @@ class NewsRepoImpl @Inject constructor(
             flow {
                 emit(Resource.Loading(message = "Loading"))
                 try {
+                    newsDao.deleteArticles(section)
                     val remoteData =
                         newsWireApi.getNewsWireApi(source = source, section = section)
                             .getNewsWireInfo(section)
