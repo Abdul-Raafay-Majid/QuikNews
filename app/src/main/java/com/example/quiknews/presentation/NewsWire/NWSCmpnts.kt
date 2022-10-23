@@ -1,28 +1,27 @@
 package com.example.quiknews.presentation.NewsWire
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.rotary.onRotaryScrollEvent
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.example.quiknews.R
 import com.example.quiknews.data.local.ArticleEntity
 import com.example.quiknews.presentation.NewsWireEvent
 import com.example.quiknews.presentation.NewsWireState
@@ -33,9 +32,8 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.pagerTabIndicatorOffset
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
+
 
 
 @OptIn(ExperimentalPagerApi::class)
@@ -92,8 +90,8 @@ fun SectionContentScreen(
     newsWireViewModel: NewsWireViewModel
 ) {
 
-    LaunchedEffect(pagerState){
-        snapshotFlow { pagerState.currentPage }.collect{ page->
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.currentPage }.collect { page ->
             newsWireViewModel.apply {
                 getNewsWireUseCases(NewsWireEvent.GetArticles(page))
             }
@@ -120,6 +118,7 @@ fun ArticleItem(
     newsWireViewModel: NewsWireViewModel
 ) {
     val context = LocalContext.current
+    val link = stringResource(id = R.string.ny_times_url)
     Card(
         modifier = modifier
             .padding(horizontal = 16.dp, vertical = 16.dp),
@@ -135,8 +134,11 @@ fun ArticleItem(
                 Column(
                     modifier = Modifier.weight(3f)
                 ) {
-                    Row() {
+                    Row {
                         Image(
+                            modifier = Modifier.clickable {
+                                newsWireViewModel.launchNYWebsite(context, link)
+                            },
                             painter = painterResource(id = com.example.quiknews.R.drawable.poweredby_nytimes_30a),
                             contentDescription = null
                         )
@@ -193,7 +195,7 @@ fun ArticleItem(
                 ) {
                     Icon(
                         imageVector = ImageVector
-                            .vectorResource(id = com.example.quiknews.R.drawable.ic_baseline_more_horiz_24),
+                            .vectorResource(id = com.example.quiknews.R.drawable.ic_baseline_share_24),
                         contentDescription = null,
                         tint = Color.Black
                     )
@@ -232,7 +234,7 @@ fun SectionContent(
         newsWireState.newsWireArticles?.let { articles ->
 
             LazyColumn() {
-                itemsIndexed(articles) { index, article ->
+                itemsIndexed(articles) { _, article ->
                     ArticleItem(
                         article = article,
                         modifier = Modifier,
@@ -251,7 +253,9 @@ fun SectionContent(
 
         newsWireState.error?.let {
             Text(
-                modifier = Modifier.align(Alignment.Center).padding(top = 55.dp),
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(top = 55.dp),
                 text = it,
                 style = MaterialTheme.typography.h6
             )

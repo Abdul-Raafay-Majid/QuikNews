@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.quiknews.R
 import com.example.quiknews.core.utils.Resource
-import com.example.quiknews.data.NewsRepoImpl
 import com.example.quiknews.domain.NewsWireUseCase
 import com.example.quiknews.presentation.utils.Sections
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -155,6 +154,15 @@ class NewsWireViewModel @Inject constructor(
             )
         }
 
+    }
+
+    fun launchNYWebsite(context: Context, link: String) {
+        viewModelScope.launch {
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                setData(Uri.parse(link))
+            }
+            context.startActivity(intent)
+        }
     }
 }
 

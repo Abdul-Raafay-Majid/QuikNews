@@ -14,9 +14,6 @@ interface NewsDao {
    @Query("DELETE FROM ArticleEntity")
    suspend fun deleteAllArticles()
 
-   @Query("SELECT * FROM articleentity")
-   suspend fun getAllArticles(): List<ArticleEntity>?
-
    @Query("SELECT * FROM articleentity WHERE section=:section")
    suspend fun getArticleBySection(section:String):List<ArticleEntity>
 }

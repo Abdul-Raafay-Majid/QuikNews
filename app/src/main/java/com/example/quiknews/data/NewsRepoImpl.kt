@@ -19,7 +19,7 @@ import javax.inject.Inject
 class NewsRepoImpl @Inject constructor(
     private val newsWireApi: NewsWireApi,
     private val newsDao: NewsDao,
-    private val ioDispatcher: CoroutineDispatcher=Dispatchers.IO
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : NewsRepo {
 
     override suspend fun deleteAllArticles() {
@@ -36,7 +36,7 @@ class NewsRepoImpl @Inject constructor(
             flow {
                 emit(Resource.Loading(message = "Loading"))
                 var dbData: List<ArticleEntity>? = newsDao.getArticleBySection(section)
-                if(dbData.isNullOrEmpty()) {
+                if (dbData.isNullOrEmpty()) {
                     try {
                         val remoteData =
                             newsWireApi.getNewsWireApi(source = source, section = section)
@@ -55,9 +55,9 @@ class NewsRepoImpl @Inject constructor(
                 }
 
                 dbData = newsDao.getArticleBySection(section)
-                val newsData=NewsWireInfo(
+                val newsData = NewsWireInfo(
                     articles = dbData,
-                    section=section
+                    section = section
                 )
                 emit(Resource.Success(newsData))
             }
@@ -66,7 +66,10 @@ class NewsRepoImpl @Inject constructor(
 
     }
 
-    override suspend fun refreshArticle(source: String, section: String):Flow<Resource<NewsWireInfo>> {
+    override suspend fun refreshArticle(
+        source: String,
+        section: String
+    ): Flow<Resource<NewsWireInfo>> {
         return withContext(ioDispatcher) {
             flow {
                 emit(Resource.Loading(message = "Loading"))
@@ -87,9 +90,9 @@ class NewsRepoImpl @Inject constructor(
                     emit(Resource.Error("Check your internet connection!"))
                 }
                 val dbData = newsDao.getArticleBySection(section)
-                val newsData=NewsWireInfo(
+                val newsData = NewsWireInfo(
                     articles = dbData,
-                    section=section
+                    section = section
                 )
                 emit(Resource.Success(newsData))
             }

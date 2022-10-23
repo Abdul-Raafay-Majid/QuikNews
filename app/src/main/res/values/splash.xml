@@ -2,7 +2,8 @@
 <resources>
     <style name="Theme.app.Starting" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/orange</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/logo_final</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/logo_final_small</item>
         <item name="postSplashScreenTheme">@style/Theme.QuikNews</item>
+        <item name="windowSplashScreenAnimationDuration">600</item>
     </style>
 </resources>

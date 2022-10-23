@@ -4,4 +4,5 @@
     <string name="article_item_button_text">Read the full article on NY Times</string>
     <string name="share_txt">Share News</string>
     <string name="all_txt">all</string>
+    <string name="ny_times_url">https://developer.nytimes.com/</string>
 </resources>
