@@ -35,7 +35,6 @@ import com.google.accompanist.pager.pagerTabIndicatorOffset
 import kotlinx.coroutines.launch
 
 
-
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun SectionTabs(
@@ -48,6 +47,7 @@ fun SectionTabs(
     ScrollableTabRow(
         modifier = modifier,
         selectedTabIndex = pagerState.currentPage,
+        backgroundColor = Color.White,
         indicator = { tabPositions ->
             TabRowDefaults.Indicator(
                 modifier = Modifier.pagerTabIndicatorOffset(
