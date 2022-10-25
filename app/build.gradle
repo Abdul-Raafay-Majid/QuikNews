@@ -19,11 +19,17 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
+
+        Properties properties=new Properties()
+        properties.load(project.rootProject.file("local.properties").newDataInputStream())
+
+        buildConfigField "String", "API_KEY", "\"${properties.getProperty("API_KEY")}\""
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -106,5 +112,8 @@ dependencies {
 
     //Google Ads
     implementation 'com.google.android.gms:play-services-ads:21.3.0'
+
+    //Leak Canary
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.9.1'
 
 }

@@ -1,10 +1,11 @@
 package com.example.quiknews.data.remote
 
+import androidx.annotation.Keep
 import com.example.quiknews.data.local.ArticleEntity
 import com.example.quiknews.domain.model.ArticleDto
 import com.example.quiknews.domain.model.NewsWireInfo
 
-data class NewsWireDto(
+@Keep data class NewsWireDto(
     val status:String,
     val copyright:String,
     val num_results:Int,

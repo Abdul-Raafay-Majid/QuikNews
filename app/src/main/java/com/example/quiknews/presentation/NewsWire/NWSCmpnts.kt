@@ -14,11 +14,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.quiknews.R
@@ -32,6 +34,9 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.pagerTabIndicatorOffset
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
 import kotlinx.coroutines.launch
 
 
@@ -263,6 +268,27 @@ fun SectionContent(
     }
 
 }
+
+@Composable
+fun NewsWireBottomBar() {
+    val deviceCurrentWidth = LocalConfiguration.current.screenWidthDp.toInt()
+
+    AndroidView(factory = {
+        AdView(it).apply {
+            setAdSize(
+                AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
+                    it, deviceCurrentWidth
+                )
+            )
+            adUnitId = "ca-app-pub-3940256099942544/6300978111"
+            loadAd(AdRequest.Builder().build())
+
+
+        }
+    })
+}
+
+
 
 
 

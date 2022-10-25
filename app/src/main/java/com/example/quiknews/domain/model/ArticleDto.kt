@@ -1,8 +1,10 @@
 package com.example.quiknews.domain.model
 
+import androidx.annotation.Keep
 import androidx.room.PrimaryKey
 
 
+@Keep
 data class ArticleDto(
     val section:String,
     val subsection:String,
