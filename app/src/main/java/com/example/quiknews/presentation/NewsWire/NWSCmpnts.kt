@@ -1,6 +1,7 @@
 package com.example.quiknews.presentation.NewsWire
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -49,37 +50,47 @@ fun SectionTabs(
 ) {
 
     val scope = rememberCoroutineScope()
-    ScrollableTabRow(
-        modifier = modifier,
-        selectedTabIndex = pagerState.currentPage,
-        backgroundColor = Color.White,
-        indicator = { tabPositions ->
-            TabRowDefaults.Indicator(
-                modifier = Modifier.pagerTabIndicatorOffset(
-                    pagerState, tabPositions
-                ),
-                color = MaterialTheme.colors.primary
-            )
-        }
+    Row(
+        modifier = modifier.background(Color.White),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        sections.forEachIndexed { index, section ->
-            LeadingIconTab(
-                icon = {},
-                selected = pagerState.currentPage == index,
-                text = {
-                    Text(
-                        text = section.display_name,
-                        style = MaterialTheme.typography.subtitle1
-                    )
-                },
-                onClick = {
-                    scope.launch {
-                        pagerState.animateScrollToPage(index)
-                    }
-                },
-            )
-        }
+        Image(
+            modifier = Modifier.weight(1f).padding(4.dp),
+            painter = painterResource(id = R.drawable.icon),
+            contentDescription = null
+        )
+        ScrollableTabRow(
+            modifier = Modifier.weight(9f),
+            selectedTabIndex = pagerState.currentPage,
+            backgroundColor = Color.White,
+            indicator = { tabPositions ->
+                TabRowDefaults.Indicator(
+                    modifier = Modifier.pagerTabIndicatorOffset(
+                        pagerState, tabPositions
+                    ),
+                    color = MaterialTheme.colors.primary
+                )
+            }
+        ) {
+            sections.forEachIndexed { index, section ->
+                LeadingIconTab(
+                    icon = {},
+                    selected = pagerState.currentPage == index,
+                    text = {
+                        Text(
+                            text = section.display_name,
+                            style = MaterialTheme.typography.subtitle1
+                        )
+                    },
+                    onClick = {
+                        scope.launch {
+                            pagerState.animateScrollToPage(index)
+                        }
+                    },
+                )
+            }
 
+        }
     }
 
 }
